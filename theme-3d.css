@@ -1,0 +1,84 @@
+/* Aula Abierta — tema 3D animado */
+@property --ang { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+:root { --v:#7c3aed; --vd:#4c1d95; --c:#22d3ee; --p:#f472b6; --a:#fbbf24; }
+html { background:#f5f3ff; }
+body, main { background-color: transparent !important; }
+
+/* Fondo: malla de color que se mueve lentamente */
+body::before {
+  content:""; position:fixed; inset:-20%; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(40% 35% at 20% 15%, rgba(124,58,237,.28), transparent 70%),
+    radial-gradient(35% 35% at 85% 20%, rgba(34,211,238,.28), transparent 70%),
+    radial-gradient(40% 40% at 75% 85%, rgba(244,114,182,.25), transparent 70%),
+    radial-gradient(35% 35% at 10% 80%, rgba(251,191,36,.22), transparent 70%);
+  animation: mesh 22s ease-in-out infinite alternate;
+}
+@keyframes mesh { to { transform: translate3d(4%,3%,0) rotate(6deg) scale(1.08); } }
+
+/* Formas 3D flotantes (se crean en theme-3d.js) */
+.bg3d { position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; perspective:900px; }
+.orb { position:absolute; border-radius:50%; opacity:.55;
+  background: radial-gradient(circle at 30% 28%, #fff 0 8%, var(--c1) 30%, var(--c2) 75%);
+  box-shadow: inset -10px -14px 24px rgba(0,0,0,.18), 0 24px 40px -14px var(--c2);
+  animation: floaty var(--t,9s) ease-in-out infinite alternate; }
+@keyframes floaty { to { transform: translate3d(var(--dx,14px), -34px, 0) scale(1.06); } }
+.cube { position:absolute; width:56px; height:56px; transform-style:preserve-3d; opacity:.6;
+  animation: spin3d 16s linear infinite; }
+.cube i { position:absolute; inset:0; border:2px solid rgba(255,255,255,.7);
+  background:linear-gradient(135deg, rgba(124,58,237,.65), rgba(34,211,238,.65)); }
+.cube i:nth-child(1){transform:translateZ(28px)} .cube i:nth-child(2){transform:rotateY(180deg) translateZ(28px)}
+.cube i:nth-child(3){transform:rotateY(90deg) translateZ(28px)} .cube i:nth-child(4){transform:rotateY(-90deg) translateZ(28px)}
+.cube i:nth-child(5){transform:rotateX(90deg) translateZ(28px)} .cube i:nth-child(6){transform:rotateX(-90deg) translateZ(28px)}
+@keyframes spin3d { to { transform: rotateX(360deg) rotateY(360deg); } }
+
+/* Barra superior e inferior: vidrio con borde de color animado */
+header.fixed, nav.fixed { background: rgba(255,255,255,.72) !important; backdrop-filter: blur(16px) saturate(1.4); }
+header.fixed { border-bottom: 3px solid transparent;
+  border-image: linear-gradient(90deg, var(--v), var(--c), var(--p), var(--a), var(--v)) 1;
+  background-size:300% 100%; }
+nav.fixed { border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, var(--a), var(--p), var(--c), var(--v), var(--a)) 1; }
+
+/* Tarjetas con grosor 3D e inclinación al mover el puntero */
+.bg-surface-container-lowest.rounded-xl, article.rounded-xl, [data-tilt] {
+  transform-style: preserve-3d; transition: transform .25s ease, box-shadow .25s ease;
+  box-shadow: 0 1px 0 #fff inset, 0 5px 0 -1px rgba(124,58,237,.22), 0 20px 28px -14px rgba(76,29,149,.45);
+}
+[data-tilt].is-tilting { transition: transform .06s linear; }
+
+/* Tarjeta principal: degradado animado */
+.bg-primary-container.rounded-xl, .bg-primary-container.rounded-2xl {
+  background: linear-gradient(120deg, #6d28d9, #c026d3, #0891b2, #6d28d9) !important;
+  background-size: 300% 300%; animation: flow 12s ease infinite;
+  box-shadow: 0 6px 0 #3b1580, 0 24px 34px -12px rgba(76,29,149,.6) !important;
+}
+@keyframes flow { 50% { background-position: 100% 50%; } }
+
+/* Botones 3D que se hunden al pulsar */
+button.bg-primary, a.bg-primary, button.bg-primary-container, a.bg-primary-container,
+button.bg-secondary, a.bg-secondary {
+  background-image: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 55%);
+  box-shadow: 0 4px 0 rgba(0,0,0,.3), 0 10px 16px -6px rgba(76,29,149,.5);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+button.bg-primary:active, a.bg-primary:active, button.bg-primary-container:active,
+a.bg-primary-container:active, button.bg-secondary:active, a.bg-secondary:active {
+  transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.3), 0 4px 8px -4px rgba(76,29,149,.5);
+}
+
+/* Foto de perfil: aro de colores que gira y flota */
+img[data-tp="photo"] {
+  border: 3px solid transparent;
+  background: linear-gradient(#fff,#fff) padding-box,
+    conic-gradient(from var(--ang), var(--v), var(--c), var(--p), var(--a), var(--v)) border-box;
+  animation: ring 6s linear infinite, bob 4s ease-in-out infinite alternate;
+  box-shadow: 0 10px 18px -6px rgba(76,29,149,.55);
+}
+@keyframes ring { to { --ang: 360deg; } }
+@keyframes bob { to { transform: translateY(-3px) rotateY(10deg); } }
+
+:focus-visible { outline: 3px solid var(--c); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
